@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Rimpi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: #000;
+    color: #fff;
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+  }
+
+  /* florals */
+  .floral-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .floral-layer svg {
+    position: absolute;
+    fill: none;
+    stroke-width: 0.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .fl-tl { top: -20px; left: -20px; width: 220px; transform: rotate(-10deg); opacity: 0.55; stroke: #e8435a; }
+  .fl-tr { top: -10px; right: -20px; width: 200px; transform: rotate(12deg) scaleX(-1); opacity: 0.5; stroke: #f4a7b9; }
+  .fl-bl { bottom: 20px; left: -10px; width: 180px; transform: rotate(8deg); opacity: 0.5; stroke: #f0c060; }
+  .fl-br { bottom: 10px; right: -10px; width: 200px; transform: rotate(-15deg) scaleX(-1); opacity: 0.5; stroke: #e8435a; }
+  .fl-mid { top: 50%; left: -30px; width: 160px; transform: translateY(-50%) rotate(5deg); opacity: 0.25; stroke: #f4a7b9; }
+  .fl-mid2 { top: 50%; right: -30px; width: 160px; transform: translateY(-50%) rotate(-5deg) scaleX(-1); opacity: 0.25; stroke: #f0c060; }
+
+  /* grain */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    opacity: 0.13;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── HERO ── */
+  #hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-sun {
+    position: absolute;
+    width: min(80vw, 480px);
+    height: min(80vw, 480px);
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow:
+      0 0 0 40px rgba(255,255,255,0.02),
+      0 0 0 100px rgba(255,255,255,0.012),
+      0 0 0 200px rgba(255,255,255,0.006);
+    animation: slowPulse 6s ease-in-out infinite;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 7px;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    margin-bottom: 22px;
+    animation: fadeUp 1.4s ease 0.3s both;
+  }
+
+  .hero-name {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(56px, 16vw, 110px);
+    font-weight: 600;
+    letter-spacing: 14px;
+    color: #fff;
+    text-transform: uppercase;
+    line-height: 1;
+    animation: fadeUp 1.4s ease 0.5s both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-sub {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: clamp(15px, 3.5vw, 19px);
+    color: rgba(255,255,255,0.35);
+    margin-top: 20px;
+    animation: fadeUp 1.4s ease 0.8s both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    animation: fadeUp 1.4s ease 1.4s both;
+  }
+
+  .scroll-hint span {
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 5px;
+    color: rgba(255,255,255,0.22);
+    text-transform: uppercase;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+    animation: scrollDrop 2s ease-in-out infinite;
+  }
+
+  /* ── TIMELINE ── */
+  #timeline {
+    position: relative;
+    padding: 100px 0 60px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  /* vertical spine */
+  #timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom,
+      transparent,
+      rgba(255,255,255,0.12) 8%,
+      rgba(255,255,255,0.12) 92%,
+      transparent
+    );
+    transform: translateX(-50%);
+  }
+
+  /* ── MEMORY CARD ── */
+  .memory {
+    display: flex;
+    align-items: flex-start;
+    padding: 0 28px 90px;
+    position: relative;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+
+  .memory.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* alternate left/right */
+  .memory.left { flex-direction: row; text-align: right; }
+  .memory.right { flex-direction: row; text-align: left; }
+
+  /* dot on spine */
+  .memory::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 6px;
+    transform: translateX(-50%);
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #000;
+    border: 1px solid rgba(255,255,255,0.4);
+    z-index: 2;
+    transition: border-color 0.6s ease, box-shadow 0.6s ease;
+  }
+
+  .memory.visible::before {
+    border-color: rgba(255,255,255,0.9);
+    box-shadow: 0 0 12px rgba(255,255,255,0.2);
+  }
+
+  .memory-content {
+    flex: 1;
+    padding: 0 32px;
+  }
+
+  .memory-year {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 5px;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .memory-title {
+    font-family: 'IM Fell English', serif;
+    font-size: clamp(20px, 5vw, 26px);
+    line-height: 1.3;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  .memory-body {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(15px, 3.5vw, 17px);
+    line-height: 1.9;
+    color: rgba(255,255,255,0.5);
+    font-style: italic;
+  }
+
+  /* empty half for spacing */
+  .memory-spacer { flex: 1; }
+
+  /* ── POEM SECTION ── */
+  #poem-section {
+    padding: 80px 24px 60px;
+    text-align: center;
+    position: relative;
+  }
+
+  .poem-sun {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(70vw, 440px);
+    height: min(70vw, 440px);
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.04);
+    box-shadow:
+      0 0 0 50px rgba(255,255,255,0.018),
+      0 0 0 120px rgba(255,255,255,0.01),
+      0 0 0 200px rgba(255,255,255,0.005);
+    pointer-events: none;
+  }
+
+  .poem-divider {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.2), transparent);
+    margin: 0 auto 60px;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  .poem-divider.visible { opacity: 1; }
+
+  .poem-label {
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 7px;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    margin-bottom: 50px;
+    opacity: 0;
+    transition: opacity 1s ease 0.2s;
+  }
+  .poem-label.visible { opacity: 1; }
+
+  .poem-line {
+    display: block;
+    font-family: 'IM Fell English', serif;
+    font-size: clamp(18px, 4.5vw, 23px);
+    line-height: 2;
+    color: #fff;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 1.2s ease, transform 1.2s ease;
+  }
+
+  .poem-line.italic {
+    font-style: italic;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .poem-line.gap { margin-bottom: 28px; }
+
+  .poem-line.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .kubo-line {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(14px, 3.5vw, 17px);
+    line-height: 1.9;
+    color: rgba(255,255,255,0.35);
+    margin: 42px auto;
+    max-width: 420px;
+    opacity: 0;
+    transition: opacity 1.8s ease;
+  }
+  .kubo-line.visible { opacity: 1; }
+
+  /* ── FINAL ── */
+  #final {
+    padding: 60px 24px 120px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1.4s ease, transform 1.4s ease;
+  }
+  #final.visible { opacity: 1; transform: translateY(0); }
+
+  .final-name {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(28px, 8vw, 52px);
+    letter-spacing: 10px;
+    color: #fff;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .final-wish {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: clamp(15px, 4vw, 20px);
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 2px;
+  }
+
+  .final-stamp {
+    margin-top: 52px;
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 6px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+  }
+
+  /* ── KEYFRAMES ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slowPulse {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.02); }
+  }
+
+  @keyframes scrollDrop {
+    0% { transform: scaleY(0); transform-origin: top; opacity: 1; }
+    50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+    100% { transform: scaleY(1); transform-origin: top; opacity: 0; }
+  }
+
+  /* mobile padding */
+  @media (max-width: 600px) {
+    #timeline { padding: 80px 0 40px; }
+    .memory { padding: 0 16px 70px; }
+    .memory-content { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- FLORAL LAYER -->
+<div class="floral-layer">
+
+  <!-- TOP LEFT: Rose -->
+  <svg class="fl-tl" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+    <!-- stem -->
+    <path d="M100 220 C100 180 95 160 100 130"/>
+    <!-- leaf left -->
+    <path d="M100 165 C80 155 65 140 70 125 C80 140 90 150 100 155"/>
+    <!-- leaf right -->
+    <path d="M100 150 C118 138 135 125 130 108 C120 125 110 138 100 145"/>
+    <!-- rose petals -->
+    <path d="M100 130 C90 120 82 108 88 96 C94 108 98 120 100 130"/>
+    <path d="M100 130 C110 120 118 108 112 96 C106 108 102 120 100 130"/>
+    <path d="M100 130 C88 122 78 112 80 100 C88 110 95 122 100 128"/>
+    <path d="M100 130 C112 122 122 112 120 100 C112 110 105 122 100 128"/>
+    <path d="M100 130 C92 118 88 104 96 94 C98 106 100 118 100 130"/>
+    <path d="M100 130 C108 118 112 104 104 94 C102 106 100 118 100 130"/>
+    <!-- center -->
+    <circle cx="100" cy="106" r="8"/>
+    <path d="M96 106 C98 102 102 102 104 106 C102 110 98 110 96 106"/>
+  </svg>
+
+  <!-- TOP RIGHT: Tulip -->
+  <svg class="fl-tr" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+    <!-- stem -->
+    <path d="M100 220 C100 185 102 165 100 135"/>
+    <!-- leaf -->
+    <path d="M100 175 C82 162 72 145 78 128 C88 145 96 162 100 170"/>
+    <!-- tulip head -->
+    <path d="M80 135 C78 115 82 98 100 90 C118 98 122 115 120 135"/>
+    <path d="M80 135 C75 118 74 100 100 88 C126 100 125 118 120 135"/>
+    <!-- inner petals -->
+    <path d="M90 135 C88 118 90 102 100 95 C110 102 112 118 110 135"/>
+    <!-- petal tips -->
+    <path d="M80 120 C76 108 80 96 86 90"/>
+    <path d="M120 120 C124 108 120 96 114 90"/>
+    <path d="M100 135 C100 118 100 100 100 88"/>
+  </svg>
+
+  <!-- BOTTOM LEFT: Lily -->
+  <svg class="fl-bl" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+    <!-- stem -->
+    <path d="M100 220 C100 190 98 170 100 140"/>
+    <!-- leaves -->
+    <path d="M100 180 C80 168 68 150 75 132 C86 150 95 168 100 176"/>
+    <path d="M100 160 C120 148 132 130 126 112 C115 130 106 148 100 156"/>
+    <!-- lily petals -->
+    <path d="M100 140 C88 128 78 114 84 98 C92 114 98 128 100 140"/>
+    <path d="M100 140 C112 128 122 114 116 98 C108 114 102 128 100 140"/>
+    <path d="M100 140 C86 130 74 118 76 100 C86 116 94 130 100 138"/>
+    <path d="M100 140 C114 130 126 118 124 100 C114 116 106 130 100 138"/>
+    <path d="M100 140 C100 126 100 110 100 96"/>
+    <!-- stamens -->
+    <line x1="100" y1="120" x2="88" y2="105"/><circle cx="88" cy="104" r="2"/>
+    <line x1="100" y1="120" x2="112" y2="105"/><circle cx="112" cy="104" r="2"/>
+    <line x1="100" y1="120" x2="100" y2="102"/><circle cx="100" cy="101" r="2"/>
+    <line x1="100" y1="120" x2="92" y2="108"/><circle cx="91" cy="107" r="1.5"/>
+    <line x1="100" y1="120" x2="108" y2="108"/><circle cx="109" cy="107" r="1.5"/>
+  </svg>
+
+  <!-- BOTTOM RIGHT: Rose bud -->
+  <svg class="fl-br" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+    <path d="M100 220 C100 180 96 158 100 128"/>
+    <path d="M100 168 C80 156 68 138 74 120 C85 138 94 156 100 164"/>
+    <path d="M100 148 C120 136 134 118 128 100 C116 118 107 136 100 144"/>
+    <path d="M100 128 C90 118 82 106 88 94 C94 106 98 118 100 128"/>
+    <path d="M100 128 C110 118 118 106 112 94 C106 106 102 118 100 128"/>
+    <path d="M100 128 C88 120 78 110 80 98 C88 108 95 120 100 126"/>
+    <path d="M100 128 C112 120 122 110 120 98 C112 108 105 120 100 126"/>
+    <circle cx="100" cy="100" r="6"/>
+  </svg>
+
+  <!-- MID LEFT: Tulip small -->
+  <svg class="fl-mid" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+    <path d="M100 220 C100 185 102 165 100 135"/>
+    <path d="M100 175 C82 162 72 145 78 128 C88 145 96 162 100 170"/>
+    <path d="M80 135 C78 115 82 98 100 90 C118 98 122 115 120 135"/>
+    <path d="M80 135 C75 118 74 100 100 88 C126 100 125 118 120 135"/>
+    <path d="M90 135 C88 118 90 102 100 95 C110 102 112 118 110 135"/>
+  </svg>
+
+  <!-- MID RIGHT: Lily small -->
+  <svg class="fl-mid2" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+    <path d="M100 220 C100 190 98 170 100 140"/>
+    <path d="M100 180 C80 168 68 150 75 132 C86 150 95 168 100 176"/>
+    <path d="M100 140 C88 128 78 114 84 98 C92 114 98 128 100 140"/>
+    <path d="M100 140 C112 128 122 114 116 98 C108 114 102 128 100 140"/>
+    <path d="M100 140 C86 130 74 118 76 100 C86 116 94 130 100 138"/>
+    <path d="M100 140 C114 130 126 118 124 100 C114 116 106 130 100 138"/>
+    <line x1="100" y1="120" x2="88" y2="105"/><circle cx="88" cy="104" r="2"/>
+    <line x1="100" y1="120" x2="112" y2="105"/><circle cx="112" cy="104" r="2"/>
+  </svg>
+
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-sun"></div>
+  <div class="hero-eyebrow">a story in time</div>
+  <div class="hero-name">Rimpi</div>
+  <div class="hero-sub">five years of quiet, and one very loud heartbeat</div>
+  <div class="scroll-hint">
+    <span>scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section id="timeline">
+
+  <div class="memory left" data-index="0">
+    <div class="memory-content">
+      <div class="memory-year">2020</div>
+      <div class="memory-title">The First Sight</div>
+      <div class="memory-body">She sat right in front of him. He stopped paying attention to the class. He stopped paying attention to everything.</div>
+    </div>
+    <div class="memory-spacer"></div>
+  </div>
+
+  <div class="memory right" data-index="1">
+    <div class="memory-spacer"></div>
+    <div class="memory-content">
+      <div class="memory-year">2020</div>
+      <div class="memory-title">The Silence</div>
+      <div class="memory-body">He was fighting his own body then. Eczema. Psoriasis. A war on his skin that made him feel unworthy of even a single word. So he said nothing. He loved her quietly, from a distance, like watching the sun without daring to look directly.</div>
+    </div>
+  </div>
+
+  <div class="memory left" data-index="2">
+    <div class="memory-content">
+      <div class="memory-year">2020 — later</div>
+      <div class="memory-title">The End of Class</div>
+      <div class="memory-body">The coaching ended. She walked out of his days. He carried her in the place behind his ribs where things go that you never quite say out loud.</div>
+    </div>
+    <div class="memory-spacer"></div>
+  </div>
+
+  <div class="memory right" data-index="3">
+    <div class="memory-spacer"></div>
+    <div class="memory-content">
+      <div class="memory-year">sometime after</div>
+      <div class="memory-title">She Texted First</div>
+      <div class="memory-body">"Hows life. What's the plan?" Just casual. Just her. He was already better — healing, slowly. And now she was back, as if the universe had been paying attention the whole time.</div>
+    </div>
+  </div>
+
+  <div class="memory left" data-index="4">
+    <div class="memory-content">
+      <div class="memory-year">in between</div>
+      <div class="memory-title">She Was With Someone</div>
+      <div class="memory-body">He was happy for her. Genuinely. And also quietly, terribly jealous in the way you can only be about someone you've never even confessed to.</div>
+    </div>
+    <div class="memory-spacer"></div>
+  </div>
+
+  <div class="memory right" data-index="5">
+    <div class="memory-spacer"></div>
+    <div class="memory-content">
+      <div class="memory-year">March 8, 2026</div>
+      <div class="memory-title">He Finally Said It</div>
+      <div class="memory-body">After five years of silence — he told her. And she said she wanted to meet him before deciding. That was enough. That was everything.</div>
+    </div>
+  </div>
+
+  <div class="memory left" data-index="6">
+    <div class="memory-content">
+      <div class="memory-year">now</div>
+      <div class="memory-title">It's Looking Like Something Real</div>
+      <div class="memory-body">Late nights on Instagram. Things said that couldn't be unsaid. Slowly, slowly — the sun coming out from behind everything that was in the way.</div>
+    </div>
+    <div class="memory-spacer"></div>
+  </div>
+
+</section>
+
+<!-- POEM -->
+<section id="poem-section">
+  <div class="poem-sun"></div>
+  <div class="poem-divider" data-watch></div>
+  <div class="poem-label" data-watch>for you</div>
+
+  <span class="poem-line" data-watch>I watched you from a broken body</span>
+  <span class="poem-line" data-watch>that didn't know yet it would survive —</span>
+  <span class="poem-line italic" data-watch>you sat like sunlight</span>
+  <span class="poem-line italic gap" data-watch>that forgot to ask permission.</span>
+
+  <span class="poem-line" data-watch>I kept my silence like a scar.</span>
+  <span class="poem-line" data-watch>Carried you like something</span>
+  <span class="poem-line italic gap" data-watch>I had no right to hold.</span>
+
+  <span class="poem-line" data-watch>Five years is a long time</span>
+  <span class="poem-line" data-watch>to love someone quietly.</span>
+  <span class="poem-line" data-watch>Five years is nothing</span>
+  <span class="poem-line italic gap" data-watch>when the sun is that bright.</span>
+
+  <span class="kubo-line" data-watch>
+    Without sin you are like the sun —<br>
+    even with your sins, you are like the sun.
+  </span>
+
+  <span class="poem-line" data-watch>Happy birthday, lil gangsta.</span>
+  <span class="poem-line" data-watch>The angry bird who somehow</span>
+  <span class="poem-line italic" data-watch>became PulPul's whole sky.</span>
+</section>
+
+<!-- FINAL -->
+<section id="final">
+  <div class="final-name">Rimpi</div>
+  <div class="final-wish">my lil gangsta. my whole sky.</div>
+  <div class="final-stamp">always & quietly — yours</div>
+</section>
+
+<script>
+  // Intersection Observer for scroll reveals
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15 });
+
+  // Observe memory cards
+  document.querySelectorAll('.memory').forEach(el => observer.observe(el));
+
+  // Staggered poem lines
+  const watchEls = document.querySelectorAll('[data-watch]');
+  const poemObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // stagger based on position among siblings
+        const siblings = [...entry.target.parentElement.querySelectorAll('[data-watch]')];
+        const idx = siblings.indexOf(entry.target);
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, idx * 120);
+        poemObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  watchEls.forEach(el => poemObserver.observe(el));
+
+  // Final section
+  const finalObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.2 });
+
+  finalObserver.observe(document.getElementById('final'));
+</script>
+</body>
+</html>
