@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Rimpi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: #000;
+    color: #fff;
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+  }
+
+  /* grain */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    opacity: 0.13;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── HERO ── */
+  #hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-sun {
+    position: absolute;
+    width: min(80vw, 480px);
+    height: min(80vw, 480px);
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow:
+      0 0 0 40px rgba(255,255,255,0.02),
+      0 0 0 100px rgba(255,255,255,0.012),
+      0 0 0 200px rgba(255,255,255,0.006);
+    animation: slowPulse 6s ease-in-out infinite;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 7px;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    margin-bottom: 22px;
+    animation: fadeUp 1.4s ease 0.3s both;
+  }
+
+  .hero-name {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(56px, 16vw, 110px);
+    font-weight: 600;
+    letter-spacing: 14px;
+    color: #fff;
+    text-transform: uppercase;
+    line-height: 1;
+    animation: fadeUp 1.4s ease 0.5s both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-sub {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: clamp(15px, 3.5vw, 19px);
+    color: rgba(255,255,255,0.35);
+    margin-top: 20px;
+    animation: fadeUp 1.4s ease 0.8s both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    animation: fadeUp 1.4s ease 1.4s both;
+  }
+
+  .scroll-hint span {
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 5px;
+    color: rgba(255,255,255,0.22);
+    text-transform: uppercase;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+    animation: scrollDrop 2s ease-in-out infinite;
+  }
+
+  /* ── TIMELINE ── */
+  #timeline {
+    position: relative;
+    padding: 100px 0 60px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  /* vertical spine */
+  #timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom,
+      transparent,
+      rgba(255,255,255,0.12) 8%,
+      rgba(255,255,255,0.12) 92%,
+      transparent
+    );
+    transform: translateX(-50%);
+  }
+
+  /* ── MEMORY CARD ── */
+  .memory {
+    display: flex;
+    align-items: flex-start;
+    padding: 0 28px 90px;
+    position: relative;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+
+  .memory.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* alternate left/right */
+  .memory.left { flex-direction: row; text-align: right; }
+  .memory.right { flex-direction: row-reverse; text-align: left; }
+
+  /* dot on spine */
+  .memory::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 6px;
+    transform: translateX(-50%);
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #000;
+    border: 1px solid rgba(255,255,255,0.4);
+    z-index: 2;
+    transition: border-color 0.6s ease, box-shadow 0.6s ease;
+  }
+
+  .memory.visible::before {
+    border-color: rgba(255,255,255,0.9);
+    box-shadow: 0 0 12px rgba(255,255,255,0.2);
+  }
+
+  .memory-content {
+    flex: 1;
+    padding: 0 32px;
+  }
+
+  .memory-year {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 5px;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .memory-title {
+    font-family: 'IM Fell English', serif;
+    font-size: clamp(20px, 5vw, 26px);
+    line-height: 1.3;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  .memory-body {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(15px, 3.5vw, 17px);
+    line-height: 1.9;
+    color: rgba(255,255,255,0.5);
+    font-style: italic;
+  }
+
+  /* empty half for spacing */
+  .memory-spacer { flex: 1; }
+
+  /* ── POEM SECTION ── */
+  #poem-section {
+    padding: 80px 24px 60px;
+    text-align: center;
+    position: relative;
+  }
+
+  .poem-sun {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(70vw, 440px);
+    height: min(70vw, 440px);
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.04);
+    box-shadow:
+      0 0 0 50px rgba(255,255,255,0.018),
+      0 0 0 120px rgba(255,255,255,0.01),
+      0 0 0 200px rgba(255,255,255,0.005);
+    pointer-events: none;
+  }
+
+  .poem-divider {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.2), transparent);
+    margin: 0 auto 60px;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  .poem-divider.visible { opacity: 1; }
+
+  .poem-label {
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 7px;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    margin-bottom: 50px;
+    opacity: 0;
+    transition: opacity 1s ease 0.2s;
+  }
+  .poem-label.visible { opacity: 1; }
+
+  .poem-line {
+    display: block;
+    font-family: 'IM Fell English', serif;
+    font-size: clamp(18px, 4.5vw, 23px);
+    line-height: 2;
+    color: #fff;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 1.2s ease, transform 1.2s ease;
+  }
+
+  .poem-line.italic {
+    font-style: italic;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .poem-line.gap { margin-bottom: 28px; }
+
+  .poem-line.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .kubo-line {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(14px, 3.5vw, 17px);
+    line-height: 1.9;
+    color: rgba(255,255,255,0.35);
+    margin: 42px auto;
+    max-width: 420px;
+    opacity: 0;
+    transition: opacity 1.8s ease;
+  }
+  .kubo-line.visible { opacity: 1; }
+
+  /* ── FINAL ── */
+  #final {
+    padding: 60px 24px 120px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1.4s ease, transform 1.4s ease;
+  }
+  #final.visible { opacity: 1; transform: translateY(0); }
+
+  .final-name {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(28px, 8vw, 52px);
+    letter-spacing: 10px;
+    color: #fff;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .final-wish {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: clamp(15px, 4vw, 20px);
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 2px;
+  }
+
+  .final-stamp {
+    margin-top: 52px;
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 6px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+  }
+
+  /* ── KEYFRAMES ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slowPulse {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.02); }
+  }
+
+  @keyframes scrollDrop {
+    0% { transform: scaleY(0); transform-origin: top; opacity: 1; }
+    50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+    100% { transform: scaleY(1); transform-origin: top; opacity: 0; }
+  }
+
+  /* mobile padding */
+  @media (max-width: 600px) {
+    #timeline { padding: 80px 0 40px; }
+    .memory { padding: 0 16px 70px; }
+    .memory-content { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-sun"></div>
+  <div class="hero-eyebrow">a story in time</div>
+  <div class="hero-name">Rimpi</div>
+  <div class="hero-sub">five years of quiet, and one very loud heartbeat</div>
+  <div class="scroll-hint">
+    <span>scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section id="timeline">
+
+  <div class="memory left" data-index="0">
+    <div class="memory-content">
+      <div class="memory-year">2020</div>
+      <div class="memory-title">The First Sight</div>
+      <div class="memory-body">She sat right in front of him. He stopped paying attention to the class. He stopped paying attention to everything.</div>
+    </div>
+    <div class="memory-spacer"></div>
+  </div>
+
+  <div class="memory right" data-index="1">
+    <div class="memory-spacer"></div>
+    <div class="memory-content">
+      <div class="memory-year">2020</div>
+      <div class="memory-title">The Silence</div>
+      <div class="memory-body">He was fighting his own body then. Eczema. Psoriasis. A war on his skin that made him feel unworthy of even a single word. So he said nothing. He loved her quietly, from a distance, like watching the sun without daring to look directly.</div>
+    </div>
+  </div>
+
+  <div class="memory left" data-index="2">
+    <div class="memory-content">
+      <div class="memory-year">2020 — later</div>
+      <div class="memory-title">The End of Class</div>
+      <div class="memory-body">The coaching ended. She walked out of his days. He carried her in the place behind his ribs where things go that you never quite say out loud.</div>
+    </div>
+    <div class="memory-spacer"></div>
+  </div>
+
+  <div class="memory right" data-index="3">
+    <div class="memory-spacer"></div>
+    <div class="memory-content">
+      <div class="memory-year">sometime after</div>
+      <div class="memory-title">She Texted First</div>
+      <div class="memory-body">"Hows life. What's the plan?" Just casual. Just her. He was already better — healing, slowly. And now she was back, as if the universe had been paying attention the whole time.</div>
+    </div>
+  </div>
+
+  <div class="memory left" data-index="4">
+    <div class="memory-content">
+      <div class="memory-year">in between</div>
+      <div class="memory-title">She Was With Someone</div>
+      <div class="memory-body">He was happy for her. Genuinely. And also quietly, terribly jealous in the way you can only be about someone you've never even confessed to.</div>
+    </div>
+    <div class="memory-spacer"></div>
+  </div>
+
+  <div class="memory right" data-index="5">
+    <div class="memory-spacer"></div>
+    <div class="memory-content">
+      <div class="memory-year">March 8, 2026</div>
+      <div class="memory-title">He Finally Said It</div>
+      <div class="memory-body">After five years of silence — he told her. And she said she wanted to meet him before deciding. That was enough. That was everything.</div>
+    </div>
+  </div>
+
+  <div class="memory left" data-index="6">
+    <div class="memory-content">
+      <div class="memory-year">now</div>
+      <div class="memory-title">It's Looking Like Something Real</div>
+      <div class="memory-body">Late nights on Instagram. Things said that couldn't be unsaid. Slowly, slowly — the sun coming out from behind everything that was in the way.</div>
+    </div>
+    <div class="memory-spacer"></div>
+  </div>
+
+</section>
+
+<!-- POEM -->
+<section id="poem-section">
+  <div class="poem-sun"></div>
+  <div class="poem-divider" data-watch></div>
+  <div class="poem-label" data-watch>for you</div>
+
+  <span class="poem-line" data-watch>I watched you from a broken body</span>
+  <span class="poem-line" data-watch>that didn't know yet it would survive —</span>
+  <span class="poem-line italic" data-watch>you sat like sunlight</span>
+  <span class="poem-line italic gap" data-watch>that forgot to ask permission.</span>
+
+  <span class="poem-line" data-watch>I kept my silence like a scar.</span>
+  <span class="poem-line" data-watch>Carried you like something</span>
+  <span class="poem-line italic gap" data-watch>I had no right to hold.</span>
+
+  <span class="poem-line" data-watch>Five years is a long time</span>
+  <span class="poem-line" data-watch>to love someone quietly.</span>
+  <span class="poem-line" data-watch>Five years is nothing</span>
+  <span class="poem-line italic gap" data-watch>when the sun is that bright.</span>
+
+  <span class="kubo-line" data-watch>
+    Without sin you are like the sun —<br>
+    even with your sins, you are like the sun.
+  </span>
+
+  <span class="poem-line" data-watch>Happy birthday, lil gangsta.</span>
+  <span class="poem-line" data-watch>The angry bird who somehow</span>
+  <span class="poem-line italic" data-watch>became PulPul's whole sky.</span>
+</section>
+
+<!-- FINAL -->
+<section id="final">
+  <div class="final-name">Rimpi</div>
+  <div class="final-wish">happy birthday, my hero</div>
+  <div class="final-stamp">always & quietly — yours</div>
+</section>
+
+<script>
+  // Intersection Observer for scroll reveals
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15 });
+
+  // Observe memory cards
+  document.querySelectorAll('.memory').forEach(el => observer.observe(el));
+
+  // Staggered poem lines
+  const watchEls = document.querySelectorAll('[data-watch]');
+  const poemObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // stagger based on position among siblings
+        const siblings = [...entry.target.parentElement.querySelectorAll('[data-watch]')];
+        const idx = siblings.indexOf(entry.target);
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, idx * 120);
+        poemObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  watchEls.forEach(el => poemObserver.observe(el));
+
+  // Final section
+  const finalObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.2 });
+
+  finalObserver.observe(document.getElementById('final'));
+</script>
+</body>
+</html>
